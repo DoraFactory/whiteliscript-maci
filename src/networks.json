@@ -1,0 +1,26 @@
+{
+    "cosmos-hub": {
+        "rpc": ["https://cosmos-rpc.polkachu.com/"],
+        "path": {
+            "DelegatorDelegations": "/cosmos.staking.v1beta1.Query/DelegatorDelegations"
+        }
+    },
+    "vota": {
+        "rpc": ["https://vota-archive-rpc.dorafactory.org/"],
+        "path": {
+            "DelegatorDelegations": "/cosmos.staking.v1beta1.Query/DelegatorDelegations"
+        }
+    },
+    "celestia": {
+        "rpc": [""],
+        "path": {
+            "DelegatorDelegations": "/cosmos.staking.v1beta1.Query/DelegatorDelegations"
+        }
+    },
+    "injective": {
+        "rpc": ["https://injective-rpc.polkachu.com/"],
+        "path": {
+            "DelegatorDelegations": "/cosmos.staking.v1beta1.Query/DelegatorDelegations"
+        }
+    }
+}

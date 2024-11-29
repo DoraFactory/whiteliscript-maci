@@ -1,0 +1,21 @@
+{
+  "name": "whitelist-script",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "type": "commonjs",
+  "license": "ISC",
+  "dependencies": {
+    "@cosmjs/encoding": "^0.32.4",
+    "@cosmjs/stargate": "^0.32.4",
+    "@cosmjs/tendermint-rpc": "^0.32.4",
+    "axios": "^1.7.8",
+    "dotenv": "^16.4.5",
+    "protobufjs": "^7.4.0",
+    "typescript": "^5.7.2"
+  }
+}
