@@ -23,7 +23,6 @@ async function main() {
     const client = await QueryClient.withExtensions(tmClient, setupStakingExtension);
 
     const requestMessage = { delegatorAddr };
-
     const requestBytes = stakingQuery.QueryDelegatorDelegationsRequest.encode(requestMessage).finish();
     const queryResponse = await client.queryAbci(path, requestBytes, queryHeight);
     const response = stakingQuery.QueryDelegatorDelegationsResponse.decode(queryResponse.value);
