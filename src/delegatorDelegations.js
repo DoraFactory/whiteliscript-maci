@@ -1,10 +1,10 @@
-require("dotenv").config(); 
+require("dotenv").config();
 const { QueryClient, setupStakingExtension } = require("@cosmjs/stargate");
 const { Tendermint34Client } = require("@cosmjs/tendermint-rpc");
 const stakingQuery = require("cosmjs-types/cosmos/staking/v1beta1/query");
 const pageQuery = require("cosmjs-types/cosmos/base/query/v1beta1/pagination");
 
-function getEnvVariable(variableName) {
+function getEnvVariable (variableName) {
   const value = process.env[variableName];
   if (!value) {
     throw new Error(`Environment variable "${variableName}" is not defined.`);
@@ -12,12 +12,12 @@ function getEnvVariable(variableName) {
   return value;
 }
 
-async function main() {
+async function main () {
   try {
     // Read config from environment variables
-    const rpcEndpoint = getEnvVariable("RPC_ENDPOINT"); 
-    const path = getEnvVariable("QUERY_PATH"); 
-    const delegatorAddr = getEnvVariable("DELEGATOR_ADDRESS"); 
+    const rpcEndpoint = getEnvVariable("RPC_ENDPOINT");
+    const path = getEnvVariable("QUERY_PATH");
+    const delegatorAddr = getEnvVariable("DELEGATOR_ADDRESS");
     const queryHeight = parseInt(getEnvVariable("QUERY_HEIGHT"), 10);
 
     const tmClient = await Tendermint34Client.connect(rpcEndpoint);
@@ -30,9 +30,9 @@ async function main() {
     do {
 
       const pagination = pageQuery.PageRequest.fromPartial({
-        key: nextKey, 
+        key: nextKey,
         offset: BigInt(0),
-        limit: BigInt(50), 
+        limit: BigInt(50),
         countTotal: false,
         reverse: false,
       });
@@ -46,17 +46,13 @@ async function main() {
       const queryResponse = await client.queryAbci(path, requestBytes, queryHeight);
       const response = stakingQuery.QueryDelegatorDelegationsResponse.decode(queryResponse.value);
 
-      // Collect delegation responses from the current page
       allDelegationResponses = allDelegationResponses.concat(response.delegationResponses);
 
-      // Update nextKey for the next iteration
-          // 更新分页参数
-    nextKey = response.pagination?.nextKey;
+      nextKey = response.pagination?.nextKey;
 
-    // console.log(nextKey)
-    if (total === 0 && response.pagination?.total) {
-      total = Number(response.pagination.total);
-    }
+      if (total === 0 && response.pagination?.total) {
+        total = Number(response.pagination.total);
+      }
 
       console.log("Current fetched Page delegations number is :", response.delegationResponses.length);
     } while (nextKey && nextKey.length > 0);
@@ -72,7 +68,7 @@ async function main() {
 
   } catch (error) {
     console.error("Error:", error.message);
-    process.exit(1); 
+    process.exit(1);
   }
 }
 
