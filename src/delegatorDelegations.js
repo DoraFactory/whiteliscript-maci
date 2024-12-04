@@ -31,7 +31,7 @@ async function main () {
       const pagination = pageQuery.PageRequest.fromPartial({
         key: nextKey,
         offset: BigInt(0),
-        limit: BigInt(50),
+        limit: BigInt(100),
         countTotal: false,
         reverse: false,
       });
