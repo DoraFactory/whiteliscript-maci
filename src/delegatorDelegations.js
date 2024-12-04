@@ -25,7 +25,6 @@ async function main () {
 
     let nextKey = undefined;
     let allDelegationResponses = [];
-    let total = 0;
 
     do {
 
@@ -49,10 +48,6 @@ async function main () {
       allDelegationResponses = allDelegationResponses.concat(response.delegationResponses);
 
       nextKey = response.pagination?.nextKey;
-
-      if (total === 0 && response.pagination?.total) {
-        total = Number(response.pagination.total);
-      }
 
       console.log("Current fetched Page delegations number is :", response.delegationResponses.length);
     } while (nextKey && nextKey.length > 0);
