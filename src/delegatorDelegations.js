@@ -2,6 +2,7 @@ require("dotenv").config();
 const { QueryClient, setupStakingExtension } = require("@cosmjs/stargate");
 const { Tendermint34Client } = require("@cosmjs/tendermint-rpc");
 const stakingQuery = require("cosmjs-types/cosmos/staking/v1beta1/query");
+const pageQuery = require("cosmjs-types/cosmos/base/query/v1beta1/pagination");
 
 function getEnvVariable(variableName) {
   const value = process.env[variableName];
@@ -13,7 +14,7 @@ function getEnvVariable(variableName) {
 
 async function main() {
   try {
-    // read config from env
+    // Read config from environment variables
     const rpcEndpoint = getEnvVariable("RPC_ENDPOINT"); 
     const path = getEnvVariable("QUERY_PATH"); 
     const delegatorAddr = getEnvVariable("DELEGATOR_ADDRESS"); 
@@ -22,19 +23,53 @@ async function main() {
     const tmClient = await Tendermint34Client.connect(rpcEndpoint);
     const client = await QueryClient.withExtensions(tmClient, setupStakingExtension);
 
-    const requestMessage = { delegatorAddr };
-    const requestBytes = stakingQuery.QueryDelegatorDelegationsRequest.encode(requestMessage).finish();
-    const queryResponse = await client.queryAbci(path, requestBytes, queryHeight);
-    const response = stakingQuery.QueryDelegatorDelegationsResponse.decode(queryResponse.value);
-    console.log(response)
+    let nextKey = undefined;
+    let allDelegationResponses = [];
+    let total = 0;
 
-    const decodedResponses = response.delegationResponses.map((item) => {
+    do {
+
+      const pagination = pageQuery.PageRequest.fromPartial({
+        key: nextKey, 
+        offset: BigInt(0),
+        limit: BigInt(50), 
+        countTotal: false,
+        reverse: false,
+      });
+
+      const requestMessage = {
+        delegatorAddr,
+        pagination
+      };
+
+      const requestBytes = stakingQuery.QueryDelegatorDelegationsRequest.encode(requestMessage).finish();
+      const queryResponse = await client.queryAbci(path, requestBytes, queryHeight);
+      const response = stakingQuery.QueryDelegatorDelegationsResponse.decode(queryResponse.value);
+
+      // Collect delegation responses from the current page
+      allDelegationResponses = allDelegationResponses.concat(response.delegationResponses);
+
+      // Update nextKey for the next iteration
+          // 更新分页参数
+    nextKey = response.pagination?.nextKey;
+
+    // console.log(nextKey)
+    if (total === 0 && response.pagination?.total) {
+      total = Number(response.pagination.total);
+    }
+
+      console.log("Current fetched Page delegations number is :", response.delegationResponses.length);
+    } while (nextKey && nextKey.length > 0);
+
+    // Log the final results
+    const decodedResponses = allDelegationResponses.map((item) => {
       const { delegation, balance } = item;
       return { delegation, balance };
     });
 
-    console.log("Decoded Delegation Responses:", decodedResponses);
-    console.log("Number of Delegation Responses:", decodedResponses.length);
+    console.log("The total number of Delegation Responses is:", decodedResponses.length);
+    console.log("Delegation Responses:", decodedResponses);
+
   } catch (error) {
     console.error("Error:", error.message);
     process.exit(1); 
